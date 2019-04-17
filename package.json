@@ -2,6 +2,8 @@
   "name": "node-xcb",
   "version": "0.0.0",
   "description": "XCB bindings for Node.js",
+  "main": "index.js",
+  "gypfile": true,
   "engines": {
     "node": ">= 10.13 <11"
   },
@@ -19,12 +21,9 @@
     "typescript": "^3.4.2"
   },
   "scripts": {
-    "clean": "rimraf coverage build tmp",
-    "build": "tsc -p tsconfig.release.json",
-    "dev": "tsc -w -p tsconfig.release.json",
-    "lint": "tslint -t stylish --project \"tsconfig.json\"",
-    "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "clean": "node-gyp clean",
+    "build": "node-gyp rebuild",
+    "dev": "node index.js"
   },
   "author": "Artur Komoter",
   "license": "MIT",
