@@ -1,0 +1,25 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558 
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "gyp build",
+            "type": "shell",
+            "command": "bash -c \\\"yarn build\\\"",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "node dev",
+            "type": "shell",
+            "command": "bash -c \\\"DISPLAY=localhost:0.0 yarn dev\\\"",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        }
+    ]
+}
