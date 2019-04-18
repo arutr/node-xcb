@@ -13,9 +13,9 @@
             }
         },
         {
-            "label": "node dev",
+            "label": "jest",
             "type": "shell",
-            "command": "bash -c \\\"DISPLAY=localhost:0.0 yarn dev\\\"",
+            "command": "bash -c \\\"yarn test\\\"",
             "group": {
                 "kind": "test",
                 "isDefault": true

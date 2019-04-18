@@ -23,7 +23,8 @@
   "scripts": {
     "clean": "node-gyp clean",
     "build": "node-gyp rebuild",
-    "dev": "node index.js"
+    "dev": "node index.js",
+    "test": "jest"
   },
   "author": "Artur Komoter",
   "license": "MIT",
