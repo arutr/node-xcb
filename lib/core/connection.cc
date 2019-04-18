@@ -1,4 +1,6 @@
 #include "connection.hh"
+#include "core.hh"
+#include <xcb/xcbext.h>
 #include <iostream>
 #include <sstream>
 
@@ -6,17 +8,17 @@ Napi::FunctionReference Connection::constructor;
 
 Napi::Object Connection::Init(Napi::Env env, Napi::Object exports)
 {
-    Napi::HandleScope scope(env);
+	Napi::HandleScope scope(env);
 
-    Napi::Function classDefinition = DefineClass(env, "Connection", {
-        InstanceMethod("connect", &Connection::Connect),
-        InstanceMethod("connectionHasError", &Connection::ConnectionHasError),
-        InstanceMethod("disconnect", &Connection::Disconnect),
-        InstanceMethod("flush", &Connection::Flush),
-        InstanceMethod("getFileDescriptor", &Connection::GetFileDescriptor),
-        InstanceMethod("pollForEvent", &Connection::PollForEvent),
-        InstanceMethod("pollForReply", &Connection::PollForReply)
-    });
+	auto classDefinition = DefineClass(env, "Connection", {
+		InstanceMethod("connect", &Connection::Connect),
+		InstanceMethod("connectionHasError", &Connection::ConnectionHasError),
+		InstanceMethod("disconnect", &Connection::Disconnect),
+		InstanceMethod("flush", &Connection::Flush),
+		InstanceMethod("getFileDescriptor", &Connection::GetFileDescriptor),
+		InstanceMethod("pollForEvent", &Connection::PollForEvent),
+		InstanceMethod("pollForReply", &Connection::PollForReply)
+	});
 
 	constructor = Napi::Persistent(classDefinition);
 	constructor.SuppressDestruct();
@@ -32,11 +34,11 @@ Connection::Connection(const Napi::CallbackInfo& info) : Napi::ObjectWrap<Connec
 
 void Connection::Connect(const Napi::CallbackInfo& info)
 {
-	Napi::Env env = info.Env();
+	auto env = info.Env();
 	Napi::HandleScope scope(env);
 
 	const char* displayName = nullptr;
-	int* screen = nullptr;
+	int screen = 0;
 
 	if(info.Length() > 0)
 	{
@@ -60,14 +62,15 @@ void Connection::Connect(const Napi::CallbackInfo& info)
 		}
 		else
 		{
-			screen = (int*) int(info[1].As<Napi::Number>());
+			screen = info[1].As<Napi::Number>();
 		}
 	}
 
-	this->connection = xcb_connect(displayName, screen);
+	this->connection = xcb_connect(displayName, &screen);
 	int error = this->ConnectionHasError(info).As<Napi::Number>();
 	if(error)
 	{
+		this->Disconnect(info);
 		std::ostringstream message;
 		message << "Failed to connect to X server (Error " << error << ")";
 		Napi::Error::New(env, message.str()).ThrowAsJavaScriptException();
@@ -84,22 +87,56 @@ void Connection::Disconnect(const Napi::CallbackInfo& info)
 	xcb_disconnect(this->connection);
 }
 
-void Connection::Flush(const Napi::CallbackInfo& info)
+Napi::Value Connection::Flush(const Napi::CallbackInfo& info)
 {
-	xcb_flush(this->connection);
+	return Napi::Number::New(info.Env(), xcb_flush(this->connection));
 }
 
 Napi::Value Connection::GetFileDescriptor(const Napi::CallbackInfo& info)
 {
-	return info.Env().Undefined();
+	return Napi::Number::New(info.Env(), xcb_get_file_descriptor(this->connection));
 }
 
 Napi::Value Connection::PollForEvent(const Napi::CallbackInfo& info)
 {
-	return info.Env().Undefined();
+	auto env = info.Env();
+	auto generic_event = xcb_poll_for_event(this->connection);
+	if(!generic_event)
+	{
+		return env.Null();
+	}
+
+	auto genericEventObject = Core::CreateGenericEventObject(info, generic_event);
+	delete generic_event;
+
+	return genericEventObject;
 }
 
 Napi::Value Connection::PollForReply(const Napi::CallbackInfo& info)
 {
-	return info.Env().Undefined();
+	auto env = info.Env();
+	if(info.Length() != 1 || !info[0].IsNumber())
+	{
+		Napi::TypeError::New(env, "Request sequence number expected").ThrowAsJavaScriptException();
+		return env.Undefined();
+	}
+
+	unsigned int request = info[0].As<Napi::Number>();
+	void* reply;
+	xcb_generic_error_t* error;
+	if(!xcb_poll_for_reply(this->connection, request, &reply, &error))
+	{
+		return env.Null();
+	}
+
+	if(reply)
+	{
+		return Core::CreateGenericReplyObject(info, (xcb_generic_reply_t*) reply);
+	}
+	if(error)
+	{
+		return Core::CreateGenericErrorObject(info, error);
+	}
+
+	return env.Undefined();
 }
