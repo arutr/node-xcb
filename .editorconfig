@@ -10,6 +10,6 @@ insert_final_newline = true
 insert_final_newline = false
 trim_trailing_whitespace = false
 
-[*.{js,jsx,json,ts,tsx,yml}]
+[*.{js,jsx,json,ts,tsx,yml,cc,hh}]
 indent_size = 4
 indent_style = tab
