@@ -122,20 +122,24 @@ Napi::Value Connection::PollForReply(const Napi::CallbackInfo& info)
 	}
 
 	unsigned int request = info[0].As<Napi::Number>();
-	void* reply;
+	xcb_generic_reply_t* reply;
 	xcb_generic_error_t* error;
-	if(!xcb_poll_for_reply(this->connection, request, &reply, &error))
+	if(!xcb_poll_for_reply(this->connection, request, (void**) &reply, &error))
 	{
 		return env.Null();
 	}
 
 	if(reply)
 	{
-		return Core::CreateGenericReplyObject(info, (xcb_generic_reply_t*) reply);
+		auto genericReplyObject = Core::CreateGenericReplyObject(info, reply);
+		delete reply;
+		return genericReplyObject;
 	}
 	if(error)
 	{
-		return Core::CreateGenericErrorObject(info, error);
+		auto genericErrorObject = Core::CreateGenericErrorObject(info, error);
+		delete error;
+		return genericErrorObject;
 	}
 
 	return env.Undefined();

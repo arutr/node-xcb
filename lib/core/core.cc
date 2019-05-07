@@ -45,11 +45,3 @@ Napi::Object Core::CreateGenericReplyObject(const Napi::CallbackInfo& info, cons
 
 	return object;
 }
-
-// xcb_connect
-// xcb_connection_has_error
-// xcb_disconnect
-// xcb_flush
-// xcb_get_file_descriptor
-// xcb_poll_for_event
-// xcb_poll_for_reply
