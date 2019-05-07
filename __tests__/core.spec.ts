@@ -6,7 +6,7 @@ describe('Core API', () => {
 
         test('connect', () => {
             expect(() => connection.connect('lol', 0)).toThrowError();
-            expect(() => connection.connect('localhost:0.0', 0)).not.toThrowError();
+            expect(() => connection.connect()).not.toThrowError();
         });
 
         test('flush', () => {
