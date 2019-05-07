@@ -6,7 +6,12 @@
         {
             "label": "gyp build",
             "type": "shell",
-            "command": "bash -c \\\"yarn build\\\"",
+            "windows": {
+                "command": "bash -c \\\"yarn build\\\""
+            },
+            "linux": {
+                "command": "yarn build"
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -15,7 +20,12 @@
         {
             "label": "jest",
             "type": "shell",
-            "command": "bash -c \\\"yarn test\\\"",
+            "windows": {
+                "command": "bash -c \\\"yarn test\\\""
+            },
+            "linux": {
+                "command": "yarn test"
+            },
             "group": {
                 "kind": "test",
                 "isDefault": true
