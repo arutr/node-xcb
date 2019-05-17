@@ -1,3 +1,5 @@
+#include "xcb.hh"
+
 // xcb_allow_t
 // xcb_atom_t
 // xcb_button_index_t
@@ -86,8 +88,6 @@
 // xcb_picture_t ???
 
 // -------------------------------------------------
-
-// xcb_allow_events
 
 // xcb_change_property
 // xcb_change_save_set

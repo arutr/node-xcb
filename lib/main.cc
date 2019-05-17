@@ -1,5 +1,5 @@
 #include <napi.h>
-#include "core/connection.hh"
+#include "connection.hh"
 
 Napi::Object InitAll(Napi::Env env, Napi::Object exports)
 {
