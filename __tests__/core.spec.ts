@@ -13,6 +13,10 @@ describe('Core API', () => {
             expect(connection.flush()).toBeGreaterThan(0);
         });
 
+        test('generateId', () => {
+            expect(connection.generateId()).toBeGreaterThan(0);
+        });
+
         test('getFileDescriptor', () => {
             expect(connection.getFileDescriptor()).toBeGreaterThan(-1);
         });
