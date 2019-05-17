@@ -6,7 +6,7 @@
             "cflags_cc!": [ "-fno-exceptions" ],
             "sources": [
                 "lib/main.cc",
-                "lib/core/connection.cc"
+                "lib/connection.cc"
             ],
             "include_dirs": [
                 "<!@(node -p \"require('node-addon-api').include\")"
